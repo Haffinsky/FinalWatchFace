@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_size">40dp</dimen>
+    <dimen name="date_text_size">15dp</dimen>
+    <dimen name="temp_text_size">20dp</dimen>
+    <dimen name="x_offset">15dp</dimen>
+    <dimen name="time_y_offset">70dp</dimen>
+    <dimen name="date_offset">95dp</dimen>
+    <dimen name="separator_y_offset">110dp</dimen>
+    <dimen name="weather_icon_y_offset">120dp</dimen>
+    <dimen name="weather_y_offset">140dp</dimen>
+</resources>
