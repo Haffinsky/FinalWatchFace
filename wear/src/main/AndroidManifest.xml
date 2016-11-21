@@ -10,7 +10,7 @@
     <application android:allowBackup="true" android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name" android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
-        android:resource="@drawable/round_watchface"
+        android:resource="@drawable/rndWatchface"
         >
         <service android:name=".MyWatchFace" android:label="@string/my_digital_name"
             android:permission="android.permission.BIND_WALLPAPER">
@@ -18,11 +18,11 @@
                 android:resource="@xml/watch_face" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview"
-                android:resource="@drawable/square_watchface" />
+                android:resource="@drawable/sqWatchface" />
 
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview_circular"
-                android:resource="@drawable/round_watchface" />
+                android:resource="@drawable/rndWatchface" />
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
