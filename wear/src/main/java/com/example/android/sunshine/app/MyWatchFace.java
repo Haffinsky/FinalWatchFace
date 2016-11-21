@@ -433,7 +433,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
                         Icon = BitmapFactory.decodeResource(getResources(), IconHelper.getArtResourceForWeatherCondition(weatherId));
                         maxTemp = dataMap.getString(MAX_TEMP);
                         minTemp = dataMap.getString(MIN_TEMP);
-                        Log.v("Wearable data received ", maxTemp + " " + minTemp + " " + weatherId);
+                        Log.v("Received ", maxTemp + " " + minTemp + " " + weatherId);
                         invalidate();
                     }
                 }
