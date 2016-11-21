@@ -111,6 +111,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                     @Override
                     public void onConnected(Bundle bundle) {
                         Log.v(CON_STAT, "Connected");
+                       sendDataToWatchface();
+
                     }
                     @Override
                     public void onConnectionSuspended(int i) {
@@ -716,7 +718,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             double high = cursor.getDouble(INDEX_MAX_TEMP);
             double low = cursor.getDouble(INDEX_MIN_TEMP);
 
-            Log.v("Data check", String.valueOf(weatherId) + " " + " " + String.valueOf(high)
+            Log.v("Cosmos", String.valueOf(weatherId) + " " + " " + String.valueOf(high)
             + " " + String.valueOf(low));
 
             PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(PATH);

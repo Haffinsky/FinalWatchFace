@@ -361,6 +361,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             Bitmap resizedBitmap = Bitmap.createScaledBitmap(Icon, 40, 40, true);
             String maxTempString = maxTemp;
             String minTempString = minTemp;
+            Log.v("Logging here", minTemp + " and " + maxTemp);
             float maxTempMeasureText = maxTempPaint.measureText(maxTempString);
             float maxTempXPosition = centerX - maxTempPaint.measureText(maxTempString) / 2;
             float minTempXPosition = maxTempXPosition + maxTempMeasureText + 10;
@@ -368,6 +369,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 float iconXPosition = maxTempXPosition - (resizedBitmap.getWidth() + 10);
                 canvas.drawBitmap(resizedBitmap, iconXPosition, weatherIconYOffset, new Paint());
             }
+
             canvas.drawText(maxTempString, maxTempXPosition, weatherYOffset, maxTempPaint);
             canvas.drawText(minTempString, minTempXPosition, weatherYOffset, minTempPaint);
         }
@@ -412,12 +414,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
         @Override
         public void onConnectionSuspended(int i) {
-
+            Log.v("Wearable connection","Suspended");
         }
 
         @Override
         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+            Log.v("Wearable connection","Failed");
         }
 
         @Override
@@ -426,13 +428,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 if(dataEvent.getType() == DataEvent.TYPE_CHANGED) {
                     DataItem dataItem = dataEvent.getDataItem();
                     if(dataItem.getUri().getPath().equals(PATH)) {
-
                         DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
                         int weatherId = dataMap.getInt(WEATHER_ID);
                         Icon = BitmapFactory.decodeResource(getResources(), IconHelper.getArtResourceForWeatherCondition(weatherId));
                         maxTemp = dataMap.getString(MAX_TEMP);
                         minTemp = dataMap.getString(MIN_TEMP);
-                        Log.v(DATA_CHECK, maxTemp + " " + minTemp + " " + weatherId);
+                        Log.v("Wearable data received ", maxTemp + " " + minTemp + " " + weatherId);
                         invalidate();
                     }
                 }
