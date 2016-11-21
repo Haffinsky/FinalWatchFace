@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
     protected void onResume() {
         super.onResume();
 
-        SunshineSyncAdapter.syncImmediately(this);
 
         String location = Utility.getPreferredLocation( this );
         // update the location in our second pane using the fragment manager

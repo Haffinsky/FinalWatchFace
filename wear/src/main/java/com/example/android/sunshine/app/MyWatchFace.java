@@ -83,6 +83,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
     static final String WEATHER_ID = "WEATHER_ID";
     static final String MIN_TEMP = "MIN_TEMP";
     static final String MAX_TEMP = "MAX_TEMP";
+    static final String DATA_CHECK = "Checking received data";
     private Bitmap Icon;
     private String maxTemp;
     private String minTemp;
@@ -155,7 +156,9 @@ public class MyWatchFace extends CanvasWatchFaceService {
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
 
-            googleApiClient = new GoogleApiClient.Builder(MyWatchFace.this).addApi(Wearable.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
+            googleApiClient = new GoogleApiClient.Builder(MyWatchFace.this).addApi(Wearable.API)
+                    .addConnectionCallbacks(this).addOnConnectionFailedListener(this)
+                    .build();
             googleApiClient.connect();
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(MyWatchFace.this)
@@ -215,8 +218,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             if (visible) {
                 registerReceiver();
-
-                // Update time zone in case it changed while we weren't visible.
                 calendar.setTimeZone(TimeZone.getDefault());
                 invalidate();
             } else {
@@ -226,9 +227,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     googleApiClient.disconnect();
                 }
             }
-
-            // Whether the timer should be running depends on whether we're visible (as well as
-            // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
         }
 
@@ -409,7 +407,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
         @Override
         public void onConnected(@Nullable Bundle bundle) {
             Wearable.DataApi.addListener(googleApiClient, Engine.this);
-            Log.d("Connection status","Conneccted");
+            Log.v("Wearable connection","Connected");
         }
 
         @Override
@@ -434,6 +432,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
                         Icon = BitmapFactory.decodeResource(getResources(), IconHelper.getArtResourceForWeatherCondition(weatherId));
                         maxTemp = dataMap.getString(MAX_TEMP);
                         minTemp = dataMap.getString(MIN_TEMP);
+                        Log.v(DATA_CHECK, maxTemp + " " + minTemp + " " + weatherId);
                         invalidate();
                     }
                 }

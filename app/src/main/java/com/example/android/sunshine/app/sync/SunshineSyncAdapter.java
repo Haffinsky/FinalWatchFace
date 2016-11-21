@@ -24,8 +24,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.format.Time;
@@ -61,7 +59,7 @@ import java.net.URL;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
-public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
     public static final String ACTION_DATA_UPDATED =
             "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
@@ -74,7 +72,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
 
     private GoogleApiClient googleApiClient;
     private boolean isWorking = false;
-
+    private boolean isConnected = false;
     private static final String[] NOTIFY_WEATHER_PROJECTION = new String[]{
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
             WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
@@ -82,18 +80,17 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
             WeatherContract.WeatherEntry.COLUMN_SHORT_DESC
     };
 
-    // these indices must match the projection
-    private static final int INDEX_WEATHER_ID = 0;
-    private static final int INDEX_MAX_TEMP = 1;
-    private static final int INDEX_MIN_TEMP = 2;
-    private static final int INDEX_SHORT_DESC = 3;
-
     static final String PATH = "/weather_info";
     static final String ID = "WEATHER_ID";
     static final String MIN_TEMP = "MIN_TEMP";
     static final String MAX_TEMP = "MAX_TEMP";
+    static final String CON_STAT = "Connection status";
 
 
+    private static final int INDEX_WEATHER_ID = 0;
+    private static final int INDEX_MAX_TEMP = 1;
+    private static final int INDEX_MIN_TEMP = 2;
+    private static final int INDEX_SHORT_DESC = 3;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID, LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
@@ -108,12 +105,30 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
 
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
-        if (googleApiClient == null) {
-            googleApiClient = new GoogleApiClient.Builder(context).addApi(Wearable.API).build();
-            googleApiClient.connect();
-        }
-    }
+        googleApiClient = new GoogleApiClient.Builder(getContext())
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle bundle) {
+                        Log.v(CON_STAT, "Connected");
+                    }
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        Log.v(CON_STAT, "Suspended");
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        Log.e(CON_STAT, "Connection failed");
+                    }
+                })
+                .build();
 
+        googleApiClient.connect();
+
+    }
+    /*
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         sendDataToWatchface();
@@ -129,7 +144,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.v("Connection failed", "NOT OK");
     }
-
+    */
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
@@ -682,10 +697,12 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
 
     private void sendDataToWatchface() {
         if (googleApiClient == null) {
+            Log.v("Connection status", "Not connected");
             return;
         }
-        if (googleApiClient.isConnected()) {
+        if (!googleApiClient.isConnected()) {
             googleApiClient.connect();
+            Log.v("Connection status", "Connected");
             return;
         }
         Context context = getContext();
@@ -694,12 +711,18 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
 
         Cursor cursor = context.getContentResolver().query(weatherUri, NOTIFY_WEATHER_PROJECTION, null, null, null);
         if (cursor.moveToFirst()) {
+
             int weatherId = cursor.getInt(INDEX_WEATHER_ID);
             double high = cursor.getDouble(INDEX_MAX_TEMP);
             double low = cursor.getDouble(INDEX_MIN_TEMP);
 
+            Log.v("Data check", String.valueOf(weatherId) + " " + " " + String.valueOf(high)
+            + " " + String.valueOf(low));
+
             PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(PATH);
+            //force sync
             putDataMapRequest.getDataMap().putLong("currentTimeMillis", System.currentTimeMillis());
+            //send data
             putDataMapRequest.getDataMap().putString(MAX_TEMP, Utility.formatTemperature(getContext(), high));
             putDataMapRequest.getDataMap().putString(MIN_TEMP, Utility.formatTemperature(getContext(), low));
             putDataMapRequest.getDataMap().putInt(ID, weatherId);
@@ -711,9 +734,9 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
                         @Override
                         public void onResult(DataApi.DataItemResult dataItemResult) {
                             if (dataItemResult.getStatus().isSuccess()) {
-                                Log.d("Loggity Logs", "Data sent successfully");
+                                Log.d(CON_STAT, "Data sent successfully");
                             } else {
-                                Log.d("Loggity Trogs", "Ooopsie");
+                                Log.d(CON_STAT, "Ooopsie");
                             }
                         }
                     });
