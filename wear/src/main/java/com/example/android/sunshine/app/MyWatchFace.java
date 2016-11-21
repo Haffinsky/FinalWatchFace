@@ -67,6 +67,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
+
     /**
      * Update rate in milliseconds for interactive mode. We update once a second since seconds are
      * displayed in interactive mode.
@@ -166,6 +167,11 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     .build());
             Resources resources = MyWatchFace.this.getResources();
 
+            timeYOffset = resources.getDimension(R.dimen.time_y_offset);
+            dateYOffset = resources.getDimension(R.dimen.date_offset);
+            lineSeparatorYOffset = resources.getDimension(R.dimen.separator_y_offset);
+            weatherIconYOffset = resources.getDimension(R.dimen.weather_icon_y_offset);
+            weatherYOffset = resources.getDimension(R.dimen.weather_y_offset);
             backgroundPaint = new Paint();
             backgroundPaint.setColor(resources.getColor(R.color.background));
             textPaint = new Paint();
@@ -182,11 +188,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             dateFormat.setCalendar(calendar);
             minTemp = getString(R.string.default_temp);
             maxTemp = getString(R.string.default_temp);
-            timeYOffset = resources.getDimension(R.dimen.time_y_offset);
-            dateYOffset = resources.getDimension(R.dimen.date_offset);
-            lineSeparatorYOffset = resources.getDimension(R.dimen.separator_y_offset);
-            weatherIconYOffset = resources.getDimension(R.dimen.weather_icon_y_offset);
-            weatherYOffset = resources.getDimension(R.dimen.weather_y_offset);
+
         }
 
         @Override
@@ -214,6 +216,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             if (visible) {
                 registerReceiver();
 
+                // Update time zone in case it changed while we weren't visible.
                 calendar.setTimeZone(TimeZone.getDefault());
                 invalidate();
             } else {
@@ -406,7 +409,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
         @Override
         public void onConnected(@Nullable Bundle bundle) {
             Wearable.DataApi.addListener(googleApiClient, Engine.this);
-            Log.d("Connection status","Connected");
+            Log.d("Connection status","Conneccted");
         }
 
         @Override

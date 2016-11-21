@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SunshineSyncAdapter.syncImmediately(this);
+
         mLocation = Utility.getPreferredLocation(this);
         Uri contentUri = getIntent() != null ? getIntent().getData() : null;
 
@@ -135,6 +138,9 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
     @Override
     protected void onResume() {
         super.onResume();
+
+        SunshineSyncAdapter.syncImmediately(this);
+
         String location = Utility.getPreferredLocation( this );
         // update the location in our second pane using the fragment manager
             if (location != null && !location.equals(mLocation)) {
