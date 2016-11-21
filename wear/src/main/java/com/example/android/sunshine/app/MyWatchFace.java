@@ -190,7 +190,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             maxTemp = getString(R.string.default_temp);
 
         }
-
+        //text
         @Override
         public void onDestroy() {
             mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
